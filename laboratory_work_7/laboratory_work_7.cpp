@@ -1,75 +1,136 @@
-﻿#include <clocale>
-#include <stdio.h>
-#include <conio.h>
-#include <string.h>
-# define N 2
+﻿#include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <vector>
+using namespace std;
+#define N 5
 
+struct workInWorkShop
+{
+	int orderNumber[4];
+	std::string performerServiceNumber[6];
+	int jobСode[3];
+	std::string unit[5];
+	float normOfTime[3];
+	float price[3];
+	int numberCompletedUnitsMeasure[3];
+	float costWork;
+};
 
-struct workInWorkshop
-{
-	int orderNumber;
-	char performerServiceNumber;
-	char jobСode;
-	char unit;
-	float normOfTime;
-	float price;
-	int numberCompletedUnitsMeasure;
-};
-informationAboutPassageOrdersForPerformerWithAPersonnelNumber
-struct workInWorkshop
-{
-	int orderNumber;
-	char performerServiceNumber;
-	char jobСode;
-	char unit;
-	float normOfTime;
-	float price;
-	int numberCompletedUnitsMeasure;
-};
+void createWorkInWorkShop(workInWorkShop arrStructures[N]);
+std::string getRandomChar(int sizeChar);
+void entryWorkInWorkShop(workInWorkShop arrStructures[N]);
+vector<int> requestListPerformerServiceNumber();
 
 void main()
 {
+	srand(time(NULL));
 	setlocale(LC_ALL, "ru");
-	int TN;
-	char FIO[15];
-	float NZP;
-	float SUD;
-	float VNR;
-	char ROSP[20] = "                   "; //Такое присваивание возможно только при
-	//объявлении строки!
-	ZAP Tab[N]; //Tab – массив структур int i;
-	float Itog1, Itog2, Itog3;
+
+	workInWorkShop workInWorkShop[N];
+	createWorkInWorkShop(workInWorkShop);
+	entryWorkInWorkShop(workInWorkShop);
+	entryWorkInWorkShop(workInWorkShop);
+	//sort(workInWorkShop, workInWorkShop + N, compareTwoStudents);
+	//entryWorkInWorkShop(workInWorkShop);
+	vector<int> listPerformerServiceNumber = requestListPerformerServiceNumber();
+}
+
+void createWorkInWorkShop(workInWorkShop arrStructures[N])
+{
 	for (int i = 0; i < N; i++)
 	{
-		printf("TN=");
-		scanf_s("%d", &TN);
-		//gets(FIO); // считывает строку
-		printf("Начислено ");
-		scanf_s("%f", &NZP);
-		printf("Удержано ");
-		scanf_s("%f", &SUD);
-		printf("ФИО ");
-		scanf_s("%s", &FIO);
-		Tab[i].TN = TN;
-
-		strcpy_s(Tab[i].FIO, FIO);
-		//Tab[i].NZP = NZP;
-		//Tab[i].SUD = SUD;
-		//Tab[i].VNR = NZP - SUD;
-		//strcpy_s(Tab[i].ROSP, ROSP); // Присваивать значение одной строки другой можно
-		//// только функцией strcpy_s ()!
+		*arrStructures[i].orderNumber = rand() % 9999;
+		*arrStructures[i].performerServiceNumber = getRandomChar(6);
+		*arrStructures[i].jobСode = rand() % 999;
+		*arrStructures[i].unit = getRandomChar(5);
+		*arrStructures[i].normOfTime = (float)(rand()) / ((float)(RAND_MAX / 9));
+		*arrStructures[i].price = (float)(rand()) / ((float)(RAND_MAX / 9));
+		*arrStructures[i].numberCompletedUnitsMeasure = rand() % 999;
+		arrStructures[i].costWork = *arrStructures[i].price * *arrStructures[i].numberCompletedUnitsMeasure;
 	}
-	Itog1 = Itog2 = Itog3 = 0;
-	printf("        	ВЕДОМОСТЬ ЗАРПЛАТЫ \n");
+}
+
+std::string getRandomChar(int sizeChar)
+{
+	const char POOL[] =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		"abcdefghijklmnopqrstuvwxyz"
+		"0123456789";
+	std::string randomChar = "";
+	int poolSize = sizeof(POOL) - 1;
+
+	for (int i = 0; i < sizeChar; i++)
+		randomChar += POOL[rand() % poolSize];
+
+	return randomChar;
+}
+
+void entryWorkInWorkShop(workInWorkShop arrStructures[N])
+{
+	cout
+		<< "|ID# "
+		<< setw(4) << left << "|Номер наряда|"
+		<< setw(6) << "|Табельный номер исполнителя|"
+		<< setw(3) << "|Код работы|"
+		<< setw(5) << "|Единица измерения|"
+		<< setw(3) << "|Норма времени (час.)|"
+		<< setw(3) << "|Расценка (руб. коп.)|"
+		<< setw(3) << "|Количество выполненных без брака Единиц измерения|"
+		<< setw(7) << "|Стоимость работы (руб. коп.)|"
+		<< endl;
 	for (int i = 0; i < N; i++)
 	{
-		printf("%d %15s %7.2f %7.2f %7.2f %s \n", Tab[i].TN, Tab[i].FIO, Tab[i].NZP, Tab[i].SUD, Tab[i].VNR,
-		       Tab[i].ROSP);
-		Itog1 += Tab[i].NZP; // . - доступ к полю структуры
-		Itog2 += Tab[i].SUD;
-		Itog3 += Tab[i].VNR;
+		cout
+			<< i << "\t\t"
+			<< right << *arrStructures[i].orderNumber << "\t\t"
+			<< *arrStructures[i].performerServiceNumber << "\t\t"
+			<< *arrStructures[i].jobСode << "\t\t"
+			<< *arrStructures[i].unit << "\t\t"
+			<< *arrStructures[i].normOfTime << "\t\t"
+			<< *arrStructures[i].price << "\t\t"
+			<< *arrStructures[i].numberCompletedUnitsMeasure << "\t\t"
+			<< arrStructures[i].costWork
+			<< endl;
+		//cout
+		//	<< i << "\t\t"
+		//	<< setw(4) << right << *arrStructures[i].orderNumber << "\t\t"
+		//	<< setw(6) << *arrStructures[i].performerServiceNumber << "\t\t"
+		//	<< setw(3) << *arrStructures[i].jobСode << "\t\t"
+		//	<< setw(5) << *arrStructures[i].unit << "\t\t"
+		//	<< setw(3) << *arrStructures[i].normOfTime << "\t\t"
+		//	<< setw(3) << *arrStructures[i].price << "\t\t"
+		//	<< setw(3) << *arrStructures[i].numberCompletedUnitsMeasure << "\t\t"
+		//	<< setw(6) << arrStructures[i].costWork
+		//	<< endl;
+		/*	cout << *arrStructures[i].orderNumber << "\n";
+			cout << *arrStructures[i].performerServiceNumber << "\n";
+			cout << *arrStructures[i].jobСode << "\n";
+			cout << *arrStructures[i].unit << "\n";
+			cout << *arrStructures[i].normOfTime << "\n";
+			cout << *arrStructures[i].price << "\n";
+			cout << *arrStructures[i].numberCompletedUnitsMeasure << "\n";
+			cout << arrStructures[i].costWork << "\n";*/
 	}
+}
 
-	printf("===========================================\n");
-	printf("              	%8.2f%8.2f %8.2f \n", Itog1, Itog2, Itog3);
+
+vector<int> requestListPerformerServiceNumber()
+{
+	vector<int> listPerformerServiceNumber;
+	char charPerformerServiceNumber;
+	int performerServiceNumber;
+	bool isEnd;
+
+	cout << "Введите запрашиваемые табельные номера исполнителей через строчку. По завершению ввода введите end:\n";
+	while (true)
+	{
+		cin >> charPerformerServiceNumber;
+		isEnd = charPerformerServiceNumber == (char)"end";
+		cout << isEnd;
+		if (isEnd) break;
+		performerServiceNumber = (int)charPerformerServiceNumber;
+		listPerformerServiceNumber.push_back(performerServiceNumber);
+	}
+	return listPerformerServiceNumber;
 }
