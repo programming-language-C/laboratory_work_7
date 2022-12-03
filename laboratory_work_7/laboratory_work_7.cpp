@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 using namespace std;
-#define N 10
+#define N 4
 
 struct WorkInWorkshop
 {
@@ -19,27 +19,33 @@ struct WorkInWorkshop
 };
 
 void createWorkInWorkshop(WorkInWorkshop workshopData[N]);
-string getRandomChar(int sizeChar);
-void outputWorkInWorkshop(WorkInWorkshop workshopData[N]);
+string requestPerformerServiceNumber(int index);
+string getRandomStr(int sizeStr);
+void printWorkInWorkshop(WorkInWorkshop workshopData[N]);
 vector<string> requestListPerformerServiceNumber(WorkInWorkshop workshopData[N]);
 bool isPerformerServiceNumberInWorkInWorkshop(WorkInWorkshop workshopData[N], string performerServiceNumber);
-void createSelectedPerformers(WorkInWorkshop workshopData[N], WorkInWorkshop dataOfPerformerServiceNumber[N],
+void createSelectedPerformers(WorkInWorkshop workshopData[N], WorkInWorkshop dataOfSelectedPerformers[N],
                               vector<string> listPerformerServiceNumber);
-void outputSelectedPerformersAndTotalExecutionTime(WorkInWorkshop dataOfPerformerServiceNumber[N]);
+void printSelectedPerformersTotalExecutionTimeAndCostOfWork(WorkInWorkshop dataOfSelectedPerformers[N]);
+void printRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
+void printTotalCostOfWork(float totalCostOfWork);
+void printServiceNumberFieldsAndRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
+void printServiceNumberAndFields(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
+void printTimeOfExecutionOfListedWorks(float timeOfExecutionOfListedWorks);
 
 int main()
 {
 	srand(time(NULL));
 	setlocale(LC_ALL, "ru");
 
-	WorkInWorkshop workshopData[N], dataOfPerformerServiceNumber[N];
+	WorkInWorkshop workshopData[N], dataOfSelectedPerformers[N];
 	createWorkInWorkshop(workshopData);
-	outputWorkInWorkshop(workshopData);
+	printWorkInWorkshop(workshopData);
 	vector<string> listPerformerServiceNumber = requestListPerformerServiceNumber(workshopData);
 	createSelectedPerformers(workshopData,
-	                         dataOfPerformerServiceNumber,
+	                         dataOfSelectedPerformers,
 	                         listPerformerServiceNumber);
-	outputSelectedPerformersAndTotalExecutionTime(dataOfPerformerServiceNumber);
+	printSelectedPerformersTotalExecutionTimeAndCostOfWork(dataOfSelectedPerformers);
 
 	system("PAUSE");
 	return 0;
@@ -47,12 +53,18 @@ int main()
 
 void createWorkInWorkshop(WorkInWorkshop workshopData[N])
 {
+	string performerServiceNumber;
+
 	for (int i = 0; i < N; i++)
 	{
 		*workshopData[i].orderNumber = rand() % 9999;
-		*workshopData[i].performerServiceNumber = getRandomChar(6);
+
+		//*workshopData[i].performerServiceNumber = getRandomStr(6);
+		performerServiceNumber = requestPerformerServiceNumber(i);
+		*workshopData[i].performerServiceNumber = performerServiceNumber;
+
 		*workshopData[i].jobСode = rand() % 999;
-		*workshopData[i].unit = getRandomChar(5);
+		*workshopData[i].unit = getRandomStr(5);
 		*workshopData[i].normOfTime = (float)(rand()) / ((float)(RAND_MAX / 9));
 		*workshopData[i].price = (float)(rand()) / ((float)(RAND_MAX / 9));
 		*workshopData[i].numberCompletedUnitsMeasure = rand() % 999;
@@ -60,33 +72,41 @@ void createWorkInWorkshop(WorkInWorkshop workshopData[N])
 	}
 }
 
-std::string getRandomChar(int sizeChar)
+string requestPerformerServiceNumber(int index)
+{
+	string performerServiceNumber;
+	cout << "Введите Таб. № испол. " << index << endl;
+	cin >> performerServiceNumber;
+	return performerServiceNumber;
+}
+
+std::string getRandomStr(int sizeStr)
 {
 	const char POOL[] =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz"
 		"0123456789";
-	std::string randomChar = "";
+	std::string randomStr = "";
 	int poolSize = sizeof(POOL) - 1;
 
-	for (int i = 0; i < sizeChar; i++)
-		randomChar += POOL[rand() % poolSize];
+	for (int i = 0; i < sizeStr; i++)
+		randomStr += POOL[rand() % poolSize];
 
-	return randomChar;
+	return randomStr;
 }
 
-void outputWorkInWorkshop(WorkInWorkshop workshopData[N])
+void printWorkInWorkshop(WorkInWorkshop workshopData[N])
 {
 	cout
 		<< "|ID# "
-		<< setw(4) << left << "|Номер наряда|"
-		<< setw(6) << "|Табельный номер исполнителя|"
+		<< setw(4) << left << "|№ наряда|"
+		<< setw(6) << "|Таб. № испол.|"
 		<< setw(3) << "|Код работы|"
-		<< setw(5) << "|Единица измерения|"
-		<< setw(3) << "|Норма времени (час.)|"
-		<< setw(3) << "|Расценка (руб. коп.)|"
-		<< setw(3) << "|Количество выполненных без брака Единиц измерения|"
-		<< setw(7) << "|Стоимость работы (руб. коп.)|"
+		<< setw(5) << "|Ед. изм.|"
+		<< setw(3) << "|Норма t (ч)|"
+		<< setw(3) << "|Расценка (р/к)|"
+		<< setw(3) << "|Кол. выпол. без брака Ед. изм.|"
+		<< setw(6) << "|Стоимость работы (р/к)|" << setw(6)
 		<< endl;
 	for (int i = 0; i < N; i++)
 	{
@@ -154,10 +174,11 @@ bool isPerformerServiceNumberInWorkInWorkshop(WorkInWorkshop workshopData[N], st
 }
 
 void createSelectedPerformers(WorkInWorkshop workshopData[N],
-                              WorkInWorkshop dataOfPerformerServiceNumber[N],
+                              WorkInWorkshop dataOfSelectedPerformers[N],
                               vector<string> listPerformerServiceNumber)
 {
-	int countPerformerServiceNumber = listPerformerServiceNumber.size();
+	int countPerformerServiceNumber = listPerformerServiceNumber.size(),
+	    numberOfLoopExecution = 0;
 	bool isFoundPerformerServiceNumber;
 	string performerServiceNumber;
 
@@ -165,60 +186,115 @@ void createSelectedPerformers(WorkInWorkshop workshopData[N],
 		for (int j = 0; j < N; j++)
 		{
 			performerServiceNumber = *workshopData[j].performerServiceNumber;
-			isFoundPerformerServiceNumber = listPerformerServiceNumber[i] == performerServiceNumber;
 
+			isFoundPerformerServiceNumber = listPerformerServiceNumber[i] == performerServiceNumber;
 			if (isFoundPerformerServiceNumber)
 			{
-				*dataOfPerformerServiceNumber[j].orderNumber = *workshopData[j].orderNumber;
-				*dataOfPerformerServiceNumber[j].performerServiceNumber = *workshopData[j].performerServiceNumber;
-				*dataOfPerformerServiceNumber[j].jobСode = *workshopData[j].jobСode;
-				*dataOfPerformerServiceNumber[j].unit = *workshopData[j].unit;
-				*dataOfPerformerServiceNumber[j].normOfTime = *workshopData[j].normOfTime;
-				*dataOfPerformerServiceNumber[j].price = *workshopData[j].price;
-				*dataOfPerformerServiceNumber[j].numberCompletedUnitsMeasure =
+				*dataOfSelectedPerformers[numberOfLoopExecution].orderNumber = *workshopData[j].orderNumber;
+				*dataOfSelectedPerformers[numberOfLoopExecution].performerServiceNumber = *workshopData[j].
+					performerServiceNumber;
+				*dataOfSelectedPerformers[numberOfLoopExecution].jobСode = *workshopData[j].jobСode;
+				*dataOfSelectedPerformers[numberOfLoopExecution].unit = *workshopData[j].unit;
+				*dataOfSelectedPerformers[numberOfLoopExecution].normOfTime = *workshopData[j].normOfTime;
+				*dataOfSelectedPerformers[numberOfLoopExecution].price = *workshopData[j].price;
+				*dataOfSelectedPerformers[numberOfLoopExecution].numberCompletedUnitsMeasure =
 					*workshopData[j].numberCompletedUnitsMeasure;
-				dataOfPerformerServiceNumber[j].costWork = workshopData[j].costWork;
-				break;
+				dataOfSelectedPerformers[numberOfLoopExecution].costWork = workshopData[j].costWork;
+				numberOfLoopExecution++;
 			}
 		}
 }
 
-void outputSelectedPerformersAndTotalExecutionTime(WorkInWorkshop dataOfPerformerServiceNumber[N])
+void printSelectedPerformersTotalExecutionTimeAndCostOfWork(WorkInWorkshop dataOfSelectedPerformers[N])
 {
-	//outputSelectedPerformers();
-	cout
-		<< "|ID# "
-		<< setw(4) << left << "|Номер наряда|"
-		<< setw(3) << "|Код работы|"
-		<< setw(5) << "|Единица измерения|"
-		<< setw(3) << "|Норма времени (час.)|"
-		<< setw(3) << "|Расценка (руб. коп.)|"
-		<< setw(3) << "|Количество выполненных без брака Единиц измерения|"
-		<< setw(7) << "|Стоимость работы (руб. коп.)|"
-		<< endl;
+	bool isMemoryFull,
+	     isCurrentPerformerServiceNumber,
+	     isPreviousSerialNumber;
+	float totalCostOfWork = 0,
+	      timeOfExecutionOfListedWorks = 0;
 	string currentPerformerServiceNumber,
-	       nextPerformerServiceNumber;
-	bool isCurrentPerformerServiceNumber;
+	       previousPerformerServiceNumber;
+
 	for (int i = 0; i < N; i++)
 	{
-		currentPerformerServiceNumber = *dataOfPerformerServiceNumber[i].performerServiceNumber;
-		nextPerformerServiceNumber = *dataOfPerformerServiceNumber[i + 1].performerServiceNumber;
-
-		isCurrentPerformerServiceNumber = currentPerformerServiceNumber == nextPerformerServiceNumber;
-		if (isCurrentPerformerServiceNumber)
+		isMemoryFull = *dataOfSelectedPerformers[i].orderNumber > 0;
+		if (isMemoryFull)
 		{
-			cout
-				<< i << "\t\t"
-				<< left << *dataOfPerformerServiceNumber[i].orderNumber << "\t\t"
-				<< *dataOfPerformerServiceNumber[i].jobСode << "\t\t"
-				<< *dataOfPerformerServiceNumber[i].unit << "\t\t"
-				<< *dataOfPerformerServiceNumber[i].normOfTime << "\t\t"
-				<< *dataOfPerformerServiceNumber[i].price << "\t\t"
-				<< *dataOfPerformerServiceNumber[i].numberCompletedUnitsMeasure << "\t\t"
-				<< dataOfPerformerServiceNumber[i].costWork
-				<< endl;
+			isPreviousSerialNumber = i - 1 >= 0;
+			if (isPreviousSerialNumber)
+			{
+				currentPerformerServiceNumber = *dataOfSelectedPerformers[i].performerServiceNumber;
+				previousPerformerServiceNumber = *dataOfSelectedPerformers[i - 1].performerServiceNumber;
 
-			cout << "Время выполнения перечисленных работ (час.): " << "";
+				isCurrentPerformerServiceNumber = currentPerformerServiceNumber == previousPerformerServiceNumber;
+				if (isCurrentPerformerServiceNumber)
+					printRecords(dataOfSelectedPerformers, i);
+				else
+				{
+					printTotalCostOfWork(totalCostOfWork);
+					totalCostOfWork = 0;
+					printServiceNumberFieldsAndRecords(dataOfSelectedPerformers, i);
+					totalCostOfWork += dataOfSelectedPerformers[i].costWork;
+				}
+			}
+			else
+				printServiceNumberFieldsAndRecords(dataOfSelectedPerformers, i);
+			totalCostOfWork += dataOfSelectedPerformers[i].costWork;
+			timeOfExecutionOfListedWorks += *dataOfSelectedPerformers[i].normOfTime;
 		}
 	}
+	printTimeOfExecutionOfListedWorks(timeOfExecutionOfListedWorks);
+}
+
+void printRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
+{
+	cout
+		<< "\n"
+		<< serialNumber << "\t\t"
+		<< left << *dataOfSelectedPerformers[serialNumber].orderNumber << "\t\t"
+		<< *dataOfSelectedPerformers[serialNumber].jobСode << "\t\t"
+		<< *dataOfSelectedPerformers[serialNumber].unit << "\t\t"
+		<< *dataOfSelectedPerformers[serialNumber].normOfTime << "\t\t"
+		<< *dataOfSelectedPerformers[serialNumber].price << "\t\t"
+		<< *dataOfSelectedPerformers[serialNumber].numberCompletedUnitsMeasure << "\t\t"
+		<< dataOfSelectedPerformers[serialNumber].costWork
+		<< endl;
+}
+
+void printTotalCostOfWork(float totalCostOfWork)
+{
+	cout
+		<< setw(20) << "Итого:"
+		<< setw(5) << totalCostOfWork
+		<< endl;
+}
+
+void printServiceNumberFieldsAndRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
+{
+	printServiceNumberAndFields(dataOfSelectedPerformers, serialNumber);
+	printRecords(dataOfSelectedPerformers, serialNumber);
+}
+
+void printServiceNumberAndFields(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
+{
+	string test;
+	cout
+		<< "\nСведения о прохождении нарядов для исполнителя с табельным номером "
+		<< *dataOfSelectedPerformers[serialNumber].performerServiceNumber
+		<< endl;
+	cout
+		<< "|ID# "
+		<< setw(4) << left << "|№ наряда|"
+		<< setw(3) << "|Код работы|"
+		<< setw(5) << "|Ед. изм.|"
+		<< setw(3) << "|Норма t (ч)|"
+		<< setw(3) << "|Расценка (р/к)|"
+		<< setw(3) << "|Кол. выпол. без брака Ед. изм.|"
+		<< setw(7) << "|Стоимость работы (руб. коп.)|"
+		<< endl;
+}
+
+void printTimeOfExecutionOfListedWorks(float timeOfExecutionOfListedWorks)
+{
+	cout << "Время выполнения перечисленных работ (час.): " << timeOfExecutionOfListedWorks << endl;
 }
