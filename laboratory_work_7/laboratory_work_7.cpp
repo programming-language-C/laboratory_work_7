@@ -1,5 +1,4 @@
 ﻿#include <algorithm>
-#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -60,7 +59,8 @@ void createWorkInWorkshop(WorkInWorkshop workshopData[N])
 		*workshopData[i].orderNumber = rand() % 9999;
 
 		//*workshopData[i].performerServiceNumber = getRandomStr(6);
-		performerServiceNumber = requestPerformerServiceNumber(i);
+		//performerServiceNumber = requestPerformerServiceNumber(i);
+		performerServiceNumber = 1;
 		*workshopData[i].performerServiceNumber = performerServiceNumber;
 
 		*workshopData[i].jobСode = rand() % 999;
@@ -98,27 +98,27 @@ std::string getRandomStr(int sizeStr)
 void printWorkInWorkshop(WorkInWorkshop workshopData[N])
 {
 	cout
-		<< "|ID# "
-		<< setw(4) << left << "|№ наряда|"
-		<< setw(6) << "|Таб. № испол.|"
-		<< setw(3) << "|Код работы|"
-		<< setw(5) << "|Ед. изм.|"
-		<< setw(3) << "|Норма t (ч)|"
-		<< setw(3) << "|Расценка (р/к)|"
-		<< setw(3) << "|Кол. выпол. без брака Ед. изм.|"
-		<< setw(6) << "|Стоимость работы (р/к)|" << setw(6)
+		<< "|ID#|"
+		<< "|№ наряда|"
+		<< "|Таб. № испол.|"
+		<< "|Код работы|"
+		<< "|Ед. изм.|"
+		<< "|Норма t (ч)|"
+		<< "|Расценка (р/к)|"
+		<< "|Кол. выпол. без брака Ед. изм.|"
+		<< "|Стоимость работы (р/к)|"
 		<< endl;
 	for (int i = 0; i < N; i++)
 	{
 		cout
-			<< i << "\t\t"
-			<< left << *workshopData[i].orderNumber << "\t\t"
-			<< *workshopData[i].performerServiceNumber << "\t\t"
-			<< *workshopData[i].jobСode << "\t\t"
-			<< *workshopData[i].unit << "\t\t"
+			<< "  " << i << "\t"
+			<< *workshopData[i].orderNumber << "\t\t"
+			<< *workshopData[i].performerServiceNumber << "\t"
+			<< *workshopData[i].jobСode << "\t   "
+			<< *workshopData[i].unit << "\t"
 			<< *workshopData[i].normOfTime << "\t\t"
 			<< *workshopData[i].price << "\t\t"
-			<< *workshopData[i].numberCompletedUnitsMeasure << "\t\t"
+			<< *workshopData[i].numberCompletedUnitsMeasure << "\t\t\t"
 			<< workshopData[i].costWork
 			<< endl;
 		//cout
@@ -264,8 +264,8 @@ void printRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
 void printTotalCostOfWork(float totalCostOfWork)
 {
 	cout
-		<< setw(20) << "Итого:"
-		<< setw(5) << totalCostOfWork
+		<< "Итого:"
+		<< totalCostOfWork
 		<< endl;
 }
 
@@ -284,13 +284,13 @@ void printServiceNumberAndFields(WorkInWorkshop dataOfSelectedPerformers[N], int
 		<< endl;
 	cout
 		<< "|ID# "
-		<< setw(4) << left << "|№ наряда|"
-		<< setw(3) << "|Код работы|"
-		<< setw(5) << "|Ед. изм.|"
-		<< setw(3) << "|Норма t (ч)|"
-		<< setw(3) << "|Расценка (р/к)|"
-		<< setw(3) << "|Кол. выпол. без брака Ед. изм.|"
-		<< setw(7) << "|Стоимость работы (руб. коп.)|"
+		<< left << "|№ наряда|"
+		<< "|Код работы|"
+		<< "|Ед. изм.|"
+		<< "|Норма t (ч)|"
+		<< "|Расценка (р/к)|"
+		<< "|Кол. выпол. без брака Ед. изм.|"
+		<< "|Стоимость работы (руб. коп.)|"
 		<< endl;
 }
 
