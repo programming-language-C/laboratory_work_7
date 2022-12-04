@@ -97,6 +97,7 @@ string getRandomStr(int sizeStr)
 void printWorkInWorkshop(WorkInWorkshop workshopData[N])
 {
 	cout
+		<< "\n"
 		<< left
 		<< setw(4) << "|ID#"
 		<< setw(10) << "|№ наряда|"
@@ -131,7 +132,7 @@ vector<string> requestListPerformerServiceNumber(WorkInWorkshop workshopData[N])
 	string performerServiceNumber;
 	bool isEnd, isPerformerServiceNumber;
 
-	cout << "Введите запрашиваемые табельные номера исполнителей через строчку. По завершению ввода введите end:\n";
+	cout << "\nВведите запрашиваемые табельные номера исполнителей через строчку. По завершению ввода введите end:\n";
 	while (true)
 	{
 		cin >> performerServiceNumber;
