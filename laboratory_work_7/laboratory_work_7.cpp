@@ -2,7 +2,6 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include <vector>
 using namespace std;
 #define N 10
 
@@ -19,14 +18,21 @@ struct WorkInWorkshop
 };
 
 void createWorkInWorkshop(WorkInWorkshop workshopData[N]);
-string requestPerformerServiceNumber(int index);
+string requestPerformerServiceNumberForCreateWorkshopData(int index);
 string getRandomStr(int sizeStr);
 void printWorkInWorkshop(WorkInWorkshop workshopData[N]);
-vector<string> requestListPerformerServiceNumber(WorkInWorkshop workshopData[N]);
-bool isPerformerServiceNumberInWorkInWorkshop(WorkInWorkshop workshopData[N], string performerServiceNumber);
-void createSelectedPerformers(WorkInWorkshop workshopData[N], WorkInWorkshop dataOfSelectedPerformers[N],
-                              vector<string> listPerformerServiceNumber);
-void printSelectedPerformersTotalExecutionTimeAndCostOfWork(WorkInWorkshop dataOfSelectedPerformers[N]);
+void requestPerformerServiceNumber(WorkInWorkshop workshopData[N],
+                                   WorkInWorkshop dataOfSelectedPerformers[N]);
+void findCopyAndPrintSelectedArtist(WorkInWorkshop workshopData[N],
+                                    WorkInWorkshop dataOfSelectedPerformers[N],
+                                    string requestedServiceNumber);
+void copySelectedArtist(WorkInWorkshop* workshopData,
+                        WorkInWorkshop* dataOfSelectedPerformers,
+                        int numberOfLoopExecution,
+                        int i);
+void printSelectedArtist(WorkInWorkshop dataOfSelectedPerformers[N],
+                         string previousPerformerServiceNumber,
+                         int index);
 void printRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
 void printTotalCostOfWork(float totalCostOfWork);
 void printServiceNumberFieldsAndRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber);
@@ -35,17 +41,14 @@ void printTimeOfExecutionOfListedWorks(float timeOfExecutionOfListedWorks);
 
 int main()
 {
+	WorkInWorkshop workshopData[N], dataOfSelectedPerformers[N];
+
 	srand(time(NULL));
 	setlocale(LC_ALL, "ru");
 
-	WorkInWorkshop workshopData[N], dataOfSelectedPerformers[N];
 	createWorkInWorkshop(workshopData);
 	printWorkInWorkshop(workshopData);
-	vector<string> listPerformerServiceNumber = requestListPerformerServiceNumber(workshopData);
-	createSelectedPerformers(workshopData,
-	                         dataOfSelectedPerformers,
-	                         listPerformerServiceNumber);
-	printSelectedPerformersTotalExecutionTimeAndCostOfWork(dataOfSelectedPerformers);
+	requestPerformerServiceNumber(workshopData, dataOfSelectedPerformers);
 
 	system("PAUSE");
 	return 0;
@@ -59,7 +62,7 @@ void createWorkInWorkshop(WorkInWorkshop workshopData[N])
 	{
 		*workshopData[i].orderNumber = rand() % 9999;
 
-		performerServiceNumber = requestPerformerServiceNumber(i);
+		performerServiceNumber = requestPerformerServiceNumberForCreateWorkshopData(i);
 		*workshopData[i].performerServiceNumber = performerServiceNumber;
 
 		*workshopData[i].jobСode = rand() % 999;
@@ -71,7 +74,7 @@ void createWorkInWorkshop(WorkInWorkshop workshopData[N])
 	}
 }
 
-string requestPerformerServiceNumber(int index)
+string requestPerformerServiceNumberForCreateWorkshopData(int index)
 {
 	string performerServiceNumber;
 	cout << "Введите Таб. № испол. " << index + 1 << endl;
@@ -126,110 +129,89 @@ void printWorkInWorkshop(WorkInWorkshop workshopData[N])
 	}
 }
 
-vector<string> requestListPerformerServiceNumber(WorkInWorkshop workshopData[N])
+void requestPerformerServiceNumber(WorkInWorkshop workshopData[N], WorkInWorkshop dataOfSelectedPerformers[N])
 {
-	vector<string> listPerformerServiceNumber;
-	string performerServiceNumber;
-	bool isEnd, isPerformerServiceNumber;
+	string requestedServiceNumber;
+	bool isEnd,
+	     isPerformerServiceNumber;
 
 	cout << "\nВведите запрашиваемые табельные номера исполнителей через строчку. По завершению ввода введите end:\n";
 	while (true)
 	{
-		cin >> performerServiceNumber;
-		isEnd = performerServiceNumber == "end";
+		cin >> requestedServiceNumber;
+		isEnd = requestedServiceNumber == "end";
 		if (isEnd) break;
-
-		isPerformerServiceNumber = isPerformerServiceNumberInWorkInWorkshop(workshopData, performerServiceNumber);
-		if (isPerformerServiceNumber)
-			listPerformerServiceNumber.push_back(performerServiceNumber);
-		else
-			cout << "Такого табельного номера исполнителя не существует\n";
+		findCopyAndPrintSelectedArtist(workshopData,
+		                               dataOfSelectedPerformers,
+		                               requestedServiceNumber);
 	}
-	return listPerformerServiceNumber;
 }
 
-bool isPerformerServiceNumberInWorkInWorkshop(WorkInWorkshop workshopData[N], string performerServiceNumber)
+void copySelectedArtist(WorkInWorkshop workshopData[N],
+                        WorkInWorkshop dataOfSelectedPerformers[N],
+                        int numberOfLoopExecution,
+                        int i)
 {
-	for (int i = 0; i < N; i++)
-		if (*workshopData[i].performerServiceNumber == performerServiceNumber)
-			return true;
-	return false;
+	*dataOfSelectedPerformers[numberOfLoopExecution].orderNumber = *workshopData[i].orderNumber;
+	*dataOfSelectedPerformers[numberOfLoopExecution].performerServiceNumber = *workshopData[i].
+		performerServiceNumber;
+	*dataOfSelectedPerformers[numberOfLoopExecution].jobСode = *workshopData[i].jobСode;
+	*dataOfSelectedPerformers[numberOfLoopExecution].unit = *workshopData[i].unit;
+	*dataOfSelectedPerformers[numberOfLoopExecution].normOfTime = *workshopData[i].normOfTime;
+	*dataOfSelectedPerformers[numberOfLoopExecution].price = *workshopData[i].price;
+	*dataOfSelectedPerformers[numberOfLoopExecution].numberCompletedUnitsMeasure =
+		*workshopData[i].numberCompletedUnitsMeasure;
+	dataOfSelectedPerformers[numberOfLoopExecution].costWork = workshopData[i].costWork;
 }
 
-void createSelectedPerformers(WorkInWorkshop workshopData[N],
-                              WorkInWorkshop dataOfSelectedPerformers[N],
-                              vector<string> listPerformerServiceNumber)
+void findCopyAndPrintSelectedArtist(WorkInWorkshop workshopData[N],
+                                    WorkInWorkshop dataOfSelectedPerformers[N],
+                                    string requestedServiceNumber)
 {
-	int countPerformerServiceNumber = listPerformerServiceNumber.size(),
-	    numberOfLoopExecution = 0;
 	bool isFoundPerformerServiceNumber;
-	string performerServiceNumber;
-
-	for (int i = 0; i < countPerformerServiceNumber; i++)
-		for (int j = 0; j < N; j++)
-		{
-			performerServiceNumber = *workshopData[j].performerServiceNumber;
-
-			isFoundPerformerServiceNumber = listPerformerServiceNumber[i] == performerServiceNumber;
-			if (isFoundPerformerServiceNumber)
-			{
-				*dataOfSelectedPerformers[numberOfLoopExecution].orderNumber = *workshopData[j].orderNumber;
-				*dataOfSelectedPerformers[numberOfLoopExecution].performerServiceNumber = *workshopData[j].
-					performerServiceNumber;
-				*dataOfSelectedPerformers[numberOfLoopExecution].jobСode = *workshopData[j].jobСode;
-				*dataOfSelectedPerformers[numberOfLoopExecution].unit = *workshopData[j].unit;
-				*dataOfSelectedPerformers[numberOfLoopExecution].normOfTime = *workshopData[j].normOfTime;
-				*dataOfSelectedPerformers[numberOfLoopExecution].price = *workshopData[j].price;
-				*dataOfSelectedPerformers[numberOfLoopExecution].numberCompletedUnitsMeasure =
-					*workshopData[j].numberCompletedUnitsMeasure;
-				dataOfSelectedPerformers[numberOfLoopExecution].costWork = workshopData[j].costWork;
-				numberOfLoopExecution++;
-			}
-		}
-}
-
-void printSelectedPerformersTotalExecutionTimeAndCostOfWork(WorkInWorkshop dataOfSelectedPerformers[N])
-{
-	bool isMemoryFull,
-	     isCurrentPerformerServiceNumber,
-	     isPreviousSerialNumber,
-	     isLastSerialNumber;
+	string performerServiceNumber,
+	       previousPerformerServiceNumber;
 	int numberOfLoopExecution = 0;
 	float totalCostOfWork = 0,
 	      timeOfExecutionOfListedWorks = 0;
-	string currentPerformerServiceNumber,
-	       previousPerformerServiceNumber;
 
 	for (int i = 0; i < N; i++)
 	{
-		isMemoryFull = *dataOfSelectedPerformers[i].orderNumber > 0;
-		if (isMemoryFull)
+		performerServiceNumber = *workshopData[i].performerServiceNumber;
+		isFoundPerformerServiceNumber = requestedServiceNumber == performerServiceNumber;
+		if (isFoundPerformerServiceNumber)
 		{
-			isPreviousSerialNumber = i - 1 >= 0;
-			if (isPreviousSerialNumber)
-			{
-				currentPerformerServiceNumber = *dataOfSelectedPerformers[i].performerServiceNumber;
-				previousPerformerServiceNumber = *dataOfSelectedPerformers[i - 1].performerServiceNumber;
-
-				isCurrentPerformerServiceNumber = currentPerformerServiceNumber == previousPerformerServiceNumber;
-				if (isCurrentPerformerServiceNumber)
-					printRecords(dataOfSelectedPerformers, i);
-				else
-				{
-					printTotalCostOfWork(totalCostOfWork);
-					totalCostOfWork = 0;
-					printServiceNumberFieldsAndRecords(dataOfSelectedPerformers, i);
-				}
-			}
-			else
-				printServiceNumberFieldsAndRecords(dataOfSelectedPerformers, i);
-			totalCostOfWork += dataOfSelectedPerformers[i].costWork;
-			timeOfExecutionOfListedWorks += *dataOfSelectedPerformers[i].normOfTime;
+			copySelectedArtist(workshopData, dataOfSelectedPerformers, numberOfLoopExecution, i);
+			printSelectedArtist(dataOfSelectedPerformers, previousPerformerServiceNumber, numberOfLoopExecution);
+			totalCostOfWork += workshopData[i].costWork;
+			timeOfExecutionOfListedWorks += *workshopData[i].normOfTime;
+			previousPerformerServiceNumber = performerServiceNumber;
 			numberOfLoopExecution++;
 		}
 	}
+
+	if (!numberOfLoopExecution)
+	{
+		cout << "Такого табельного номера исполнителя не существует\n";
+		return;
+	}
 	printTotalCostOfWork(totalCostOfWork);
 	printTimeOfExecutionOfListedWorks(timeOfExecutionOfListedWorks);
+}
+
+void printSelectedArtist(WorkInWorkshop dataOfSelectedPerformers[N],
+                         string previousPerformerServiceNumber,
+                         int index)
+{
+	string currentPerformerServiceNumber;
+	bool isSameServiceNumber;
+
+	currentPerformerServiceNumber = *dataOfSelectedPerformers[index].performerServiceNumber;
+	isSameServiceNumber = currentPerformerServiceNumber == previousPerformerServiceNumber;
+	if (isSameServiceNumber)
+		printRecords(dataOfSelectedPerformers, index);
+	else
+		printServiceNumberFieldsAndRecords(dataOfSelectedPerformers, index);
 }
 
 void printRecords(WorkInWorkshop dataOfSelectedPerformers[N], int serialNumber)
