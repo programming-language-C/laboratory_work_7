@@ -132,8 +132,7 @@ void printWorkInWorkshop(WorkInWorkshop workshopData[N])
 void requestPerformerServiceNumber(WorkInWorkshop workshopData[N], WorkInWorkshop dataOfSelectedPerformers[N])
 {
 	string requestedServiceNumber;
-	bool isEnd,
-	     isPerformerServiceNumber;
+	bool isEnd;
 
 	cout << "\nВведите запрашиваемые табельные номера исполнителей через строчку. По завершению ввода введите end:\n";
 	while (true)
